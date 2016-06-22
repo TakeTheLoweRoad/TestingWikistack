@@ -1,6 +1,8 @@
 var chai = require('chai');
 var spies = require('chai-spies');
 var expect = chai.expect;
+var models = require('../models');
+var Page = models.Page;
 
 chai.use(spies);
 
@@ -39,10 +41,18 @@ describe('Testing suit capabilities', function (){
 });
 
 describe('Page model', function () {
+	var ourPage;
+  beforeEach(function(){
+  	// ourPage = Page.create({title: "Best Page Ever", content: "Imagine really great content here"});
+  	ourPage = Page.build({title: "Best Page Ever", content: "Imagine really great content here", urlTitle: "besturlever"});
+  })
 
   describe('Virtuals', function () {
     describe('route', function () {
-      it('returns the url_name prepended by "/wiki/"');
+      it('returns the url_name prepended by "/wiki/"', function(){
+      	console.log("ourPageurlTitle: ", ourPage.urlTitle);
+      	expect(ourPage.route).to.equal("/wiki/" + ourPage.urlTitle);
+      });
     });
     describe('renderedContent', function () {
       it('converts the markdown-formatted content into HTML');
