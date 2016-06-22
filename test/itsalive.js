@@ -3,7 +3,9 @@ var spies = require('chai-spies');
 var expect = chai.expect;
 var models = require('../models');
 var Page = models.Page;
-
+var supertest = require('supertest');
+var app = require('../app');
+var agent = supertest.agent(app);
 chai.use(spies);
 
 describe('Testing suit capabilities', function (){
@@ -62,11 +64,17 @@ describe('Page model', function () {
     describe('Class methods', function () {
 
         beforeEach(function (done) {
+            var page = Page.create({
+                title: 'another thing',
+                content: 'pub',
+                tags: ['tag1', 'tag2']
+            })
             var newPage = Page.create({
                 title: 'something',
                 content: 'bar',
                 tags: ['foo', 'bar']
             })
+            Promise.all([page, newPage])
             .then(function () {
                 done();
             })
@@ -91,26 +99,86 @@ describe('Page model', function () {
                     done();
                 });
             });
-            it('does not get pages without the search tag');
+            it('does not get pages without the search tag', function(done){
+                Page.findByTag('bar')
+                .then(function (pages) {
+                    for (var page in pages){
+                    expect(pages[page].title).to.not.equal('another thing');
+                    }
+                    done();
+                });
+            });    
         });
     });
 
-    describe('Instance methods', function () {
-        describe('findSimilar', function () {
-            it('never gets itself');
-            it('gets other pages with any common tags');
-            it('does not get other pages without any common tags');
-        });
-    });
+    // describe('Validations', function () {
+    //     it('errors without title');
+    //     it('errors without content');
+    //     it('errors given an invalid status');
+    // });
 
-    describe('Validations', function () {
-        it('errors without title');
-        it('errors without content');
-        it('errors given an invalid status');
-    });
-
-    describe('Hooks', function () {
-        it('it sets urlTitle based on title before validating');
-    });
+    // describe('Hooks', function () {
+    //     it('it sets urlTitle based on title before validating');
+    // });
 
 });
+
+
+//Now start supertest stuff:
+describe('http requests', function () {
+
+  describe('GET /wiki/', function () {
+    it('responds with 200', function (done) {
+    agent
+    .get('/wiki')
+    .expect(200, done);
+  });
+
+  });
+
+  describe('GET /wiki/add', function () {
+    it('responds with 200', function(done){
+        agent
+        .get('/wiki/add')
+        .expect(200, done);
+    });
+  });
+
+  describe('GET /wiki/:urlTitle', function () {
+    beforeEach(function (done){
+        Page.create({title: 'not', content: 'yourmom', urlTitle:'notyourmom'})
+        .then(function (){
+            done();
+        })
+    })
+    it('responds with 404 on page that does not exist', function(done){
+        agent
+        .get('/wiki/yourmom')
+        .expect(404, done);
+    });
+    it('responds with 200 on page that does exist', function(done){
+            agent
+            .get('/wiki/notyourmom')
+            .expect(200, done);
+        })
+    });
+    
+
+  });
+
+  describe('GET /wiki/search', function () {
+    it('responds with 200');
+  });
+
+  describe('GET /wiki/:urlTitle/similar', function () {
+    it('responds with 404 for page that does not exist');
+    it('responds with 200 for similar page');
+  });
+
+  describe('POST /wiki', function () {
+    it('responds with 302');
+    it('creates a page in the database');
+  });
+
+});
+
