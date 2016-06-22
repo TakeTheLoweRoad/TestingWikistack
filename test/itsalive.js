@@ -13,18 +13,33 @@ describe('Testing suit capabilities', function (){
 		setTimeout(function () {
 			var startAgain = new Date();
 			var elapsed = startAgain - start;
-			expect(elapsed).to.be.closeTo(1000, 5);
+			expect(elapsed).to.be.closeTo(1000, 10);
 			done();
 		}, 1000);
 	});
 	it('makes sure that forEach works like forEach works', function () {
-		var someArrayOfNums = [1, 2, 3, 4, 5, 6];
-		function uselessFunction () {
-			console.log("it really doesn't matter what I do in here");
+		// var someArrayOfNums = [1, 2, 3, 4, 5, 6];
+		// function uselessFunction () {
+		// 	console.log("it really doesn't matter what I do in here");
+		// }
+		// var uselessSpy = chai.spy(uselessFunction);
+		// someArrayOfNums.forEach(uselessSpy);
+		// expect(uselessSpy).to.have.been.called.exactly(someArrayOfNums.length);
+		var obj = {
+  			foobar: function () {
+    			console.log('foo');
+    		return 'bar';
+  			}
 		}
-		var uselessSpy = chai.spy(uselessFunction);
-		someArrayOfNums.forEach(uselessSpy);
-		expect(uselessSpy).to.have.been.called.exactly(someArrayOfNums.length);
+		chai.spy.on(obj, 'foobar');
+		var someArrayOfNums = [1, 2, 3, 4, 5, 6];
+		someArrayOfNums.forEach(obj.foobar);
+
+		expect(obj.foobar).to.have.been.called.exactly(6);
+
+
+
+
 	});
 });
 
