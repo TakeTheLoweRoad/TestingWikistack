@@ -111,15 +111,15 @@ describe('Page model', function () {
         });
     });
 
-    // describe('Validations', function () {
-    //     it('errors without title');
-    //     it('errors without content');
-    //     it('errors given an invalid status');
-    // });
+    describe('Validations', function () {
+        it('errors without title');
+        it('errors without content');
+        it('errors given an invalid status');
+    });
 
-    // describe('Hooks', function () {
-    //     it('it sets urlTitle based on title before validating');
-    // });
+    describe('Hooks', function () {
+        it('it sets urlTitle based on title before validating');
+    });
 
 });
 
@@ -146,28 +146,42 @@ describe('http requests', function () {
 
   describe('GET /wiki/:urlTitle', function () {
     beforeEach(function (done){
-        Page.create({title: 'not', content: 'yourmom', urlTitle:'notyourmom'})
+        Page.create({title: 'notyourmom', content: 'yourmom'})
         .then(function (){
             done();
-        })
-    })
-    it('responds with 404 on page that does not exist', function(done){
+        });
+    });
+
+    afterEach(function (done) {
+        Page.findAll({})
+        .then(function (pages) {
+            for (var idx in pages) {
+                pages[idx].destroy();
+            }
+            done();
+        });
+    });
+
+    it('responds with 404 on page that does not exist', function (done){
         agent
         .get('/wiki/yourmom')
         .expect(404, done);
     });
-    it('responds with 200 on page that does exist', function(done){
-            agent
-            .get('/wiki/notyourmom')
-            .expect(200, done);
-        })
+
+    it('responds with 200 on page that does exist', function (done){
+        agent
+        .get('/wiki/notyourmom')
+        .expect(200, done);
     });
-    
 
   });
 
   describe('GET /wiki/search', function () {
-    it('responds with 200');
+    it('responds with 200', function (done) {
+        agent
+        .get('/wiki/search')
+        .expect(200, done);
+    });
   });
 
   describe('GET /wiki/:urlTitle/similar', function () {
@@ -181,4 +195,3 @@ describe('http requests', function () {
   });
 
 });
-
