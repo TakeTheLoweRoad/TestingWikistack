@@ -27,3 +27,8 @@ describe('Testing suit capabilities', function (){
 		expect(uselessSpy).to.have.been.called.exactly(someArrayOfNums.length);
 	});
 });
+
+// Page model tests
+	// test that datatypes are the expected datatypes
+	// test that adding blank values for fields that may not be blank raises an error of some sort
+	// I don't know how to write any of this
