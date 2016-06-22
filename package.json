@@ -1,6 +1,10 @@
 {
   "name": "wikistack",
   "version": "1.0.0",
+  "scripts": {
+    "test": "npm test",
+    "start": "nodemon app.js"
+  },
   "dependencies": {
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
