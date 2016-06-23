@@ -126,6 +126,22 @@ describe('Page model', function () {
 
 //Now start supertest stuff:
 describe('http requests', function () {
+       beforeEach(function (done){
+        Page.create({title: 'notyourmom', content: 'yourmom'})
+        .then(function (){
+            done();
+        });
+    });
+
+    afterEach(function (done) {
+        Page.findAll({})
+        .then(function (pages) {
+            for (var idx in pages) {
+                pages[idx].destroy();
+            }
+            done();
+        });
+    });
 
   describe('GET /wiki/', function () {
     it('responds with 200', function (done) {
@@ -145,22 +161,7 @@ describe('http requests', function () {
   });
 
   describe('GET /wiki/:urlTitle', function () {
-    beforeEach(function (done){
-        Page.create({title: 'notyourmom', content: 'yourmom'})
-        .then(function (){
-            done();
-        });
-    });
-
-    afterEach(function (done) {
-        Page.findAll({})
-        .then(function (pages) {
-            for (var idx in pages) {
-                pages[idx].destroy();
-            }
-            done();
-        });
-    });
+ 
 
     it('responds with 404 on page that does not exist', function (done){
         agent
@@ -185,13 +186,31 @@ describe('http requests', function () {
   });
 
   describe('GET /wiki/:urlTitle/similar', function () {
-    it('responds with 404 for page that does not exist');
-    it('responds with 200 for similar page');
+    it('responds with 404 for page that does not exist', function(done){
+        agent
+        .get('/wiki/jessesgirl/similar')
+        .expect(404, done);
+    });
+
+    it('responds with 200 for similar page', function(done){
+         agent
+        .get('/wiki/notyourmom/similar')
+        .expect(200, done);
+    });
   });
 
   describe('POST /wiki', function () {
-    it('responds with 302');
-    it('creates a page in the database');
+    it('responds with 302', function(done){
+        agent
+        .post('/wiki/')
+        .send({title: 'title of new page', content: 'content of new page', name: 'new user name', email: 'new user email'})
+        .expect(302, done);
+    });
+    it('creates a page in the database', function(done){
+        agent
+        .get('/wiki/title_of_new_page')
+        .expect(200, done);
+    });
   });
 
 });
