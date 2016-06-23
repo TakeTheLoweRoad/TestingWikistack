@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 
 var swig = require('swig');
 var path = require('path');
+/*var models = require('./models');*/
 module.exports = app;
 
 app.set('views', path.join(__dirname, './views'));
@@ -17,6 +18,17 @@ app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, './public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+/*models.User.sync({})
+.then(function () {
+    return models.Page.sync({force: true});
+})
+.then(function () {
+  app.listen(3000, function () {
+    console.log('listening to port 3000...');
+  });
+})
+.catch(console.error);*/
 
 app.use('/wiki', require('./routes/wiki'));
 app.use('/users', require('./routes/users'));

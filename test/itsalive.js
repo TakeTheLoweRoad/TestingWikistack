@@ -68,12 +68,12 @@ describe('Page model', function () {
                 title: 'another thing',
                 content: 'pub',
                 tags: ['tag1', 'tag2']
-            })
+            });
             var newPage = Page.create({
                 title: 'something',
                 content: 'bar',
                 tags: ['foo', 'bar']
-            })
+            });
             Promise.all([page, newPage])
             .then(function () {
                 done();
@@ -161,7 +161,6 @@ describe('http requests', function () {
   });
 
   describe('GET /wiki/:urlTitle', function () {
- 
 
     it('responds with 404 on page that does not exist', function (done){
         agent
@@ -203,13 +202,35 @@ describe('http requests', function () {
     it('responds with 302', function(done){
         agent
         .post('/wiki/')
-        .send({title: 'title of new page', content: 'content of new page', name: 'new user name', email: 'new user email'})
+        .send({
+            title: 'title of new page',
+            content: 'content of new page',
+            name: 'new user name',
+            email: 'new user email'})
         .expect(302, done);
     });
-    it('creates a page in the database', function(done){
+    it('creates a page in the database', function (done){
+        // ensure that db is empty, cause that makes writing this test easier
+        // also, I want to practice emptying the db
+        Page.findOne({})
+        .then(function (page) {
+            page.destroy();
+        });
+
         agent
-        .get('/wiki/title_of_new_page')
-        .expect(200, done);
+        .post('/wiki/')
+        .send({
+            title: 'title of new page',
+            content: 'content of new page',
+            name: 'new user name',
+            email: 'new user email'})
+        .then(function () {
+            Page.findOne({})
+            .then(function (page) {
+                expect(page.title).to.equal('title of new page');
+                done();
+            });
+        });
     });
   });
 
